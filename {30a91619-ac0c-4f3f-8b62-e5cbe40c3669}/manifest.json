@@ -1,0 +1,200 @@
+{
+	"$schema": "./CWC_manifest_Schema.json",
+	"mver": "1.2.0",
+	"control": {
+		"identity": {
+			"name": "Toolbox",
+			"version": "1.3",
+			"displayname": "Toolbox",
+			"icon": "./assets/tools.png",
+			"type": "guid://30a91619-ac0c-4f3f-8b62-e5cbe40c3669",
+			"start": "./control/index.html"
+		},
+		"environment": {
+			"extensions": {
+				"HMI": {
+					"mandatory": true,
+					"version": "~1.0.0"
+				}
+			}
+		},
+		"metadata": {
+			"author": "Kollinger, David",
+			"keywords": [
+				"toolbox",
+				"tool",
+				"file",
+				"download",
+				"screenshot",
+				"tab",
+				"alarm horn"
+			]
+		},
+		"contracts": {
+			"api": {
+				"methods": {
+					"Download": {
+						"parameters": {
+							"fileName": {
+								"type": "string"
+							},
+							"content": {
+								"type": "string"
+							}
+						},
+						"description": "downloads the content to the user in the given fileName."
+					},
+					"openNewTab": {
+						"parameters": {
+							"url": {
+								"type": "string"
+							}
+						},
+						"description": "opens the given URL in a new tab"
+					},
+					"takeScreenshot": {
+						"parameters": {},
+						"description": "takes a Screenshot of the website and downloads it as png to the client device"
+					},
+					"openNewWindow": {
+						"parameters": {
+							"url": {
+								"type": "string"
+							},
+							"width": {
+								"type": "number"
+							},
+							"height": {
+								"type": "number"
+							}
+						},
+						"description": "opens the given URL in a new window"
+					},
+					"closeWindow": {
+						"parameters": {},
+						"description": "closes the given window"
+					},
+					"openScreenOnMonitorX": {
+						"parameters": {
+							"url": {
+								"type": "string"
+							},
+							"startScreen": {
+								"type": "string"
+							}
+						}
+					},
+					"checkFullscreen": {
+						"parameters": {
+							"url": {
+								"type": "string"
+							}
+						}
+					},
+					"playSound":{
+						"parameters": {
+							"audioFilePath": {
+								"type": "string"
+							}
+						}
+					}
+				},
+				"events": {
+					"SizeChanged": {
+						"arguments": {
+							"newWidth": {
+								"type": "number"
+							},
+							"newHeight": {
+								"type": "number"
+							}
+						},
+						"description": "gets triggered whenever the screen width or height changes"						
+					},
+					"Url": {
+						"arguments": {
+							"url": {
+								"type": "string"
+							}
+						},
+						"description": "gets triggered on load"
+					},
+					"Touched": {
+						"arguments": {
+							"deltaXY": {
+								"type": "string"
+							}
+						},
+						"description": "get triggered whenever screen is touched"
+					},
+					"IsMonitorClient": {
+						"arguments": {
+							"value": {
+								"type": "boolean"
+							}
+						},
+						"description": "Determines during runtime, if the connected client has 'monitor only'-rights or not."
+					},	
+					"UnifiedInContainer": {
+						"arguments": {
+							"value": {
+								"type": "boolean"
+							}
+						},
+						"description": "Determines during runtime, if the Unified RT is open within a Web control (iframe) of another Unified station"
+					}					
+				},
+				"properties": {
+					"TabTitle": {
+						"type": "string",
+						"default": "WinCC Unified RT"
+					},
+					"Screens": {
+						"$ref": "#/control/types/ScreenInfos"
+					}
+				}
+			}
+		},
+		"types": {
+			"ScreenInfos": {
+				"type": "array",
+				"items": {
+					"$ref": "#/control/types/ScreenInfo"
+				}
+			},
+			"ScreenInfo": {
+				"type": "object",
+				"properties": {
+					"UnifiedScreenName": {
+						"type": "string",
+						"default": ""
+					},
+					"MonitorNumber": {
+						"type": "integer",
+						"default": 0
+					},
+					"Fullscreen": {
+						"type": "boolean",
+						"default": false
+					},
+					"Height": {
+						"type": "integer",
+						"default": 0
+					},
+					"Width": {
+						"type": "integer",
+						"default": 0
+					},
+					"Left": {
+						"type": "integer",
+						"default": 0
+					},
+					"Top": {
+						"type": "integer",
+						"default": 0
+					}
+				}
+			}
+		}
+	}
+}
