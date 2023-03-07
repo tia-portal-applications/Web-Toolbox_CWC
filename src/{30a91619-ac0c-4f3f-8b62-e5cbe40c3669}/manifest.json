@@ -67,6 +67,12 @@
 							"height": {
 								"type": "number"
 							}
+							"top": {
+								"type": "number"
+							},
+							"left": {
+								"type": "number"
+							}
 						},
 						"description": "opens the given URL in a new window"
 					},
