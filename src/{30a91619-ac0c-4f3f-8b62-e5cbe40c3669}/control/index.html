@@ -2,311 +2,311 @@
 <html>
 
 <head>
-	<title>Basic usage</title>
-	<meta charset="utf-8">
-	<!-- Web Custom Control Facade -->
-	<script type="text/javascript" src="./libs/webcc.min.js"></script>
+  <title>Basic usage</title>
+  <meta charset="utf-8">
+  <!-- Web Custom Control Facade -->
+  <script type="text/javascript" src="./libs/webcc.min.js"></script>
 </head>
 
 <body>
-	<div style="position: fixed; margin: 0px; padding: 0px; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-		<a id="aDownload"></a>
-		<script>
-			  /** @type {Array<Monitor>} */
+  <div style="position: fixed; margin: 0px; padding: 0px; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    <a id="aDownload"></a>
+    <script>
+      /** @type {Array<Monitor>} */
       const monitorInfos = [];
 
       class Monitor {
-          constructor(left, width, top, height, number, name) {
-              /** @type {number} */
-              this.left = left;
-              /** @type {number} */
-              this.width = width;
-              /** @type {number} */
-              this.top = top;
-              /** @type {number} */
-              this.height = height;
-              /** @type {number} */
-              this.number = number;
-              /** @type {string} */
-              this.name = name;
-          }
+        constructor(left, width, top, height, number, name) {
+          /** @type {number} */
+          this.left = left;
+          /** @type {number} */
+          this.width = width;
+          /** @type {number} */
+          this.top = top;
+          /** @type {number} */
+          this.height = height;
+          /** @type {number} */
+          this.number = number;
+          /** @type {string} */
+          this.name = name;
+        }
       }
 
       async function getPermission() {
-          const { state } = await navigator.permissions.query({ name: 'window-placement' });
-          console.log("permission state " + state);
-          return state;
+        const { state } = await navigator.permissions.query({ name: 'window-management' });
+        console.log("permission state " + state);
+        return state;
       }
 
       async function checkPermission(permissionName, descriptor) {
-          const permission = await navigator.permissions.query(Object.assign({ name: permissionName }, descriptor))
-          console.log(permissionName + "-status: " + permission.state);
+        const permission = await navigator.permissions.query(Object.assign({ name: permissionName }, descriptor))
+        console.log(permissionName + "-status: " + permission.state);
       }
 
       function sortTopLeft(a, b) {
-          if (a.top > b.top) {
-              return 1;
-          }
-          if (a.top < b.top) {
-              return -1;
-          }
-          if (a.left > b.left) {
-              return 1;
-          }
-          if (a.left < b.left) {
-              return -1;
-          }
-          return 0;
+        if (a.top > b.top) {
+          return 1;
+        }
+        if (a.top < b.top) {
+          return -1;
+        }
+        if (a.left > b.left) {
+          return 1;
+        }
+        if (a.left < b.left) {
+          return -1;
+        }
+        return 0;
       }
 
       async function getMonitors() {
-          try {
-              const screenDetails = await parent.window.getScreenDetails();
-              console.dir(screenDetails);
-              let _screenDetails = screenDetails.screens.slice();
-              _screenDetails.sort(function (a, b) { return sortTopLeft(a, b); });
-              let monitorNr = 1;
-              for (let i of _screenDetails) {
-                  console.log("screen: " + "number: " + monitorNr);
-                  saveMonitorInfos(i, monitorNr, i.label);
-                  monitorNr++;
-              }
-              return _screenDetails;
+        try {
+          const screenDetails = await parent.window.getScreenDetails();
+          console.dir(screenDetails);
+          let _screenDetails = screenDetails.screens.slice();
+          _screenDetails.sort(function (a, b) { return sortTopLeft(a, b); });
+          let monitorNr = 1;
+          for (let i of _screenDetails) {
+            console.log("screen: " + "number: " + monitorNr);
+            saveMonitorInfos(i, monitorNr, i.label);
+            monitorNr++;
           }
-          catch (e) {
-              console.log("permission issue?: " + e);
-              return null;
-          }
+          return _screenDetails;
+        }
+        catch (e) {
+          console.log("permission issue?: " + e);
+          return null;
+        }
       }
 
       function saveMonitorInfos(screen, monitorNr, name) {
-          let tempMoni = new Monitor(screen.availLeft, screen.availWidth, screen.availTop, screen.availHeight, monitorNr, name);
-          console.dir(tempMoni);
-          monitorInfos.push(tempMoni);
+        let tempMoni = new Monitor(screen.availLeft, screen.availWidth, screen.availTop, screen.availHeight, monitorNr, name);
+        console.dir(tempMoni);
+        monitorInfos.push(tempMoni);
       }
 
       async function setScreen(url, startScreen, screenInfo) {
-          try {
-              let newUrl = url + "?screen=" + screenInfo.UnifiedScreenName;
-              let checkOrigin = url.search("\\?");
-              let fitInMonitor = false;//not used functionality
-              let moniNr = screenInfo.MonitorNumber;
-              let newMoniNr;
-              let width = parseInt(screenInfo.Width, 10);
-              let height = parseInt(screenInfo.Height, 10);
-              let recalcX = parseInt(screenInfo.Left, 10);
-              let recalcY = parseInt(screenInfo.Top, 10);
-              // check for existing monitor, if not exist take array element zero
-              newMoniNr = ((moniNr > 0) && (moniNr <= monitorInfos.length)) ? (moniNr - 1) : 0;
-              console.log("requested monitor: " + moniNr + " found monitors: " + monitorInfos.length + " used monitor: " + newMoniNr);
+        try {
+          let newUrl = url + "?screen=" + screenInfo.UnifiedScreenName;
+          let checkOrigin = url.search("\\?");
+          let fitInMonitor = false;//not used functionality
+          let moniNr = screenInfo.MonitorNumber;
+          let newMoniNr;
+          let width = parseInt(screenInfo.Width, 10);
+          let height = parseInt(screenInfo.Height, 10);
+          let recalcX = parseInt(screenInfo.Left, 10);
+          let recalcY = parseInt(screenInfo.Top, 10);
+          // check for existing monitor, if not exist take array element zero
+          newMoniNr = ((moniNr > 0) && (moniNr <= monitorInfos.length)) ? (moniNr - 1) : 0;
+          console.log("requested monitor: " + moniNr + " found monitors: " + monitorInfos.length + " used monitor: " + newMoniNr);
 
-              // screen positioning offset for each monitor
-              // number 1 starts top left and last number ends at bottom right
-              if (screenInfo.Fullscreen) {
-                  // option for real fullscreen
-                  newUrl = newUrl + "&fullscreen=yes";
-                  recalcX = monitorInfos[newMoniNr].left;
-                  recalcY = monitorInfos[newMoniNr].top;
-              }
-              else {
-                  recalcX += monitorInfos[newMoniNr].left;
-                  recalcY += monitorInfos[newMoniNr].top;
-              }
-              // recalculate width and height for the screen to match the monitor
-              let maxWidth = null;
-              let maxHeight = null;
-              if (fitInMonitor){
-                  maxWidth = monitorInfos[newMoniNr].width - width;
-                  maxHeight = monitorInfos[newMoniNr].height - height;
-                  width = (maxWidth < width) ? maxWidth : width;
-                  height = (maxHeight < height) ? maxHeight : height;
-                  console.log("maxWidth: " + maxWidth + " maxHeight: " + maxHeight);
-              }        
-              console.log("width: " + width + " height: " + height);
-
-              let windowOptions;
-              if (screenInfo.Fullscreen) {
-                  windowOptions = "left=" + String(recalcX) + ", top=" + String(recalcY) + ", fullscreen=yes, scrollbars=auto";
-              }
-              else {
-                  windowOptions = "left=" + String(recalcX) + ", top=" + String(recalcY) + "width=" + String(width) + ", height=" + String(height);
-              }
-
-              if (checkOrigin == -1) {
-                  let _windowObjectReference = (window.open(newUrl, "_blank", windowOptions));
-                  // handle pseudo fullscreen
-                  if (screenInfo.Fullscreen) {
-                      _windowObjectReference.resizeTo(monitorInfos[newMoniNr].width,  monitorInfos[newMoniNr].height);
-                  }
-                  // resize to fit screen
-                  if ((width > 99) && (height > 99) && (screenInfo.Fullscreen == false)) {
-                      _windowObjectReference.resizeTo(width, height);
-                  }
-                  // move to new monitor
-                  console.log("move window of Screen: " + screenInfo.UnifiedScreenName + " to left pos: " + recalcX + " to top pos: " + recalcY);
-                  _windowObjectReference.moveTo(recalcX, recalcY);
-                  return startScreen;
-              }
-              return screenInfo.UnifiedScreenName;
+          // screen positioning offset for each monitor
+          // number 1 starts top left and last number ends at bottom right
+          if (screenInfo.Fullscreen) {
+            // option for real fullscreen
+            newUrl = newUrl + "&fullscreen=yes";
+            recalcX = monitorInfos[newMoniNr].left;
+            recalcY = monitorInfos[newMoniNr].top;
           }
-          catch (e) {
-              console.log("something went wrong in setScreen: " + e);
-              return;
+          else {
+            recalcX += monitorInfos[newMoniNr].left;
+            recalcY += monitorInfos[newMoniNr].top;
           }
+          // recalculate width and height for the screen to match the monitor
+          let maxWidth = null;
+          let maxHeight = null;
+          if (fitInMonitor) {
+            maxWidth = monitorInfos[newMoniNr].width - width;
+            maxHeight = monitorInfos[newMoniNr].height - height;
+            width = (maxWidth < width) ? maxWidth : width;
+            height = (maxHeight < height) ? maxHeight : height;
+            console.log("maxWidth: " + maxWidth + " maxHeight: " + maxHeight);
+          }
+          console.log("width: " + width + " height: " + height);
+
+          let windowOptions;
+          if (screenInfo.Fullscreen) {
+            windowOptions = "left=" + String(recalcX) + ", top=" + String(recalcY) + ", fullscreen=yes, scrollbars=auto";
+          }
+          else {
+            windowOptions = "left=" + String(recalcX) + ", top=" + String(recalcY) + "width=" + String(width) + ", height=" + String(height);
+          }
+
+          if (checkOrigin == -1) {
+            let _windowObjectReference = (window.open(newUrl, "_blank", windowOptions));
+            // handle pseudo fullscreen
+            if (screenInfo.Fullscreen) {
+              _windowObjectReference.resizeTo(monitorInfos[newMoniNr].width, monitorInfos[newMoniNr].height);
+            }
+            // resize to fit screen
+            if ((width > 99) && (height > 99) && (screenInfo.Fullscreen == false)) {
+              _windowObjectReference.resizeTo(width, height);
+            }
+            // move to new monitor
+            console.log("move window of Screen: " + screenInfo.UnifiedScreenName + " to left pos: " + recalcX + " to top pos: " + recalcY);
+            _windowObjectReference.moveTo(recalcX, recalcY);
+            return startScreen;
+          }
+          return screenInfo.UnifiedScreenName;
+        }
+        catch (e) {
+          console.log("something went wrong in setScreen: " + e);
+          return;
+        }
       }
 
       async function reqFullscreen(windowObjRef, monitorNumber) {
-          let elem = windowObjRef.document.body;
-          const screenDetails =  await windowObjRef.getScreenDetails();
-          const availScreens = screenDetails.screens;
-          let destScreen = screenDetails.currentScreen;
-          
-          await getMonitors();
-          let monitorName = null;
-          for (let i of monitorInfos) {
-              if (i.number == monitorNumber) {
-                  monitorName = i.name;
-              }
+        let elem = windowObjRef.document.body;
+        const screenDetails = await windowObjRef.getScreenDetails();
+        const availScreens = screenDetails.screens;
+        let destScreen = screenDetails.currentScreen;
+
+        await getMonitors();
+        let monitorName = null;
+        for (let i of monitorInfos) {
+          if (i.number == monitorNumber) {
+            monitorName = i.name;
           }
+        }
 
-          for (let k of availScreens) {
-              if (k.label == monitorName) {
-                  destScreen = k;
-                  break;
-              }
+        for (let k of availScreens) {
+          if (k.label == monitorName) {
+            destScreen = k;
+            break;
           }
+        }
 
-          let retVal = -3;
-          if (elem.requestFullscreen) {
-              try {
-                  const result = await elem.requestFullscreen({ screen: destScreen });
-                  console.log("successfull fullscreen: " + result);
-                  retVal = 1;
-              } catch (e) {
-                  console.log("rejected fullscreen " + e);
-                  retVal = 2;
-              };
-              try {
-                  const fullscreenCheck = parent.window.document.fullscreenElement
-                  console.log("is fullscreen? " + (fullscreenCheck != null));
-              }
-              catch (e) {
-                  console.log("rejected fullscreen status " + e);
-              };
-              console.log("elem.reqFulls finished? return: " + retVal);
-              return retVal;
-
-          } else if (elem.webkitRequestFullscreen) { /* Safari */
-              try {
-                  const result = await elem.webkitRequestFullscreen({ screen: destScreen });
-                  console.log("successfull fullscreen: " + result);
-                  retVal = 1;
-              } catch (e) {
-                  console.log("rejected fullscreen " + e);
-                  retVal = 2;
-              };
-              try {
-                  const fullscreenCheck = parent.window.document.webkitFullscreenElement;
-                  console.log("is fullscreen? " + (fullscreenCheck != null));
-              }
-              catch (e) {
-                  console.log("rejected fullscreen status " + e);
-              };
-              console.log("elem.reqFulls finished? return: " + retVal);
-              return retVal;
-
-          } else {// way too old browser
-              return -2;
+        let retVal = -3;
+        if (elem.requestFullscreen) {
+          try {
+            const result = await elem.requestFullscreen({ screen: destScreen });
+            console.log("successfull fullscreen: " + result);
+            retVal = 1;
+          } catch (e) {
+            console.log("rejected fullscreen " + e);
+            retVal = 2;
+          };
+          try {
+            const fullscreenCheck = parent.window.document.fullscreenElement
+            console.log("is fullscreen? " + (fullscreenCheck != null));
           }
+          catch (e) {
+            console.log("rejected fullscreen status " + e);
+          };
+          console.log("elem.reqFulls finished? return: " + retVal);
+          return retVal;
+
+        } else if (elem.webkitRequestFullscreen) { /* Safari */
+          try {
+            const result = await elem.webkitRequestFullscreen({ screen: destScreen });
+            console.log("successfull fullscreen: " + result);
+            retVal = 1;
+          } catch (e) {
+            console.log("rejected fullscreen " + e);
+            retVal = 2;
+          };
+          try {
+            const fullscreenCheck = parent.window.document.webkitFullscreenElement;
+            console.log("is fullscreen? " + (fullscreenCheck != null));
+          }
+          catch (e) {
+            console.log("rejected fullscreen status " + e);
+          };
+          console.log("elem.reqFulls finished? return: " + retVal);
+          return retVal;
+
+        } else {// way too old browser
+          return -2;
+        }
       }
 
       async function setAllScreens(url, startScreen, screenInfos) {
-          try {
-              let screenElements = screenInfos.length;
-              console.log("you have " + screenElements + " new screens to be opened");
-              for (let i of screenInfos) {
-                  console.log("screenelement: " + i.UnifiedScreenName);
-                  setScreen(url, startScreen, i);
-              }
-              return startScreen;
+        try {
+          let screenElements = screenInfos.length;
+          console.log("you have " + screenElements + " new screens to be opened");
+          for (let i of screenInfos) {
+            console.log("screenelement: " + i.UnifiedScreenName);
+            setScreen(url, startScreen, i);
           }
-          catch (e) {
-              console.log("something went wrong in setAllScreens: " + e);
-              return false;
-          }
+          return startScreen;
+        }
+        catch (e) {
+          console.log("something went wrong in setAllScreens: " + e);
+          return false;
+        }
       }
 
       async function checkFullscreen() {
-          let querystring = parent.window.location.search;
-          let urlParams = new URLSearchParams(querystring);
-          //console.log("urlParams: " + urlParams);    
-          let urlScreenName = urlParams.get("screen");
-          console.log(" get screenname: " + urlScreenName);
-          let fullscreen = urlParams.get("fullscreen");
-          console.log(" get fullscreen: " + fullscreen);
-          let screenInfos = WebCC.Properties.Screens;
+        let querystring = parent.window.location.search;
+        let urlParams = new URLSearchParams(querystring);
+        //console.log("urlParams: " + urlParams);    
+        let urlScreenName = urlParams.get("screen");
+        console.log(" get screenname: " + urlScreenName);
+        let fullscreen = urlParams.get("fullscreen");
+        console.log(" get fullscreen: " + fullscreen);
+        let screenInfos = WebCC.Properties.Screens;
 
-          if (fullscreen == "yes") {
-              let foundObject = null;
-              for (let i of screenInfos) {
-                  if (i.UnifiedScreenName == urlScreenName) {
-                      foundObject = i;
-                  }
-              }
-              if (foundObject != null) {
-                  let result = await reqFullscreen(parent.window, foundObject.MonitorNumber);
-                  return result;
-              } else {
-                  console.log("could not find a matching screen name!" + urlScreenName);
-                  return -1;
-              }
+        if (fullscreen == "yes") {
+          let foundObject = null;
+          for (let i of screenInfos) {
+            if (i.UnifiedScreenName == urlScreenName) {
+              foundObject = i;
+            }
           }
-          else {
-              console.log("no fullscreen request return 0");
-              return 0;
+          if (foundObject != null) {
+            let result = await reqFullscreen(parent.window, foundObject.MonitorNumber);
+            return result;
+          } else {
+            console.log("could not find a matching screen name!" + urlScreenName);
+            return -1;
           }
+        }
+        else {
+          console.log("no fullscreen request return 0");
+          return 0;
+        }
       }
 
       function openScreenOnMonitorX(url, startScreen) {
-          let _multiMoniSupport = false;
-          let screenDetails = null;
-          const isSupported = ("getScreenDetails" in parent.window);
-          console.log("getMonitorInfos called, supported?  " + isSupported);
-          // Offer multi-screen controls for the user.
-          if (isSupported) {
-              console.log("api supported ");
-              // The Multi-Screen Window Placement API is supported.
-              const state = getPermission();
-              _multiMoniSupport = state === 'granted';
-              console.log("multiMoni is supported: " + _multiMoniSupport);
-              if (!_multiMoniSupport) {
-              }
-              screenDetails = getMonitors();
-              screenDetails.then(function () {
-                  console.log("url: " + url);
-                  let screenInfos = WebCC.Properties.Screens;
-                  let checkOrigin = url.search("\\?");
-                  let querystring = parent.window.location.search;
-                  let urlParams = new URLSearchParams(querystring);
-                  console.log("urlParams: " + urlParams);
-                  let urlScreenName = urlParams.get("screen");
-                  console.log(" get screenname: " + urlScreenName);
-
-                  if (checkOrigin == -1) {
-                      // open new windows
-                      return setAllScreens(url, startScreen, screenInfos);
-                  }
-                  else {
-                      // return screen name do nothing else
-                      return urlScreenName;
-                  }
-              }
-              );
+        let _multiMoniSupport = false;
+        let screenDetails = null;
+        const isSupported = ("getScreenDetails" in parent.window);
+        console.log("getMonitorInfos called, supported?  " + isSupported);
+        // Offer multi-screen controls for the user.
+        if (isSupported) {
+          console.log("api supported ");
+          // The Multi-Screen Window Placement API is supported.
+          const state = getPermission();
+          _multiMoniSupport = state === 'granted';
+          console.log("multiMoni is supported: " + _multiMoniSupport);
+          if (!_multiMoniSupport) {
           }
+          screenDetails = getMonitors();
+          screenDetails.then(function () {
+            console.log("url: " + url);
+            let screenInfos = WebCC.Properties.Screens;
+            let checkOrigin = url.search("\\?");
+            let querystring = parent.window.location.search;
+            let urlParams = new URLSearchParams(querystring);
+            console.log("urlParams: " + urlParams);
+            let urlScreenName = urlParams.get("screen");
+            console.log(" get screenname: " + urlScreenName);
+
+            if (checkOrigin == -1) {
+              // open new windows
+              return setAllScreens(url, startScreen, screenInfos);
+            }
+            else {
+              // return screen name do nothing else
+              return urlScreenName;
+            }
+          }
+          );
+        }
       }
 
       const windowObjectReference = [];
-      
+
       function download(fileName, content) {
         if (content && content != 'undefined') {
           // see https://stackoverflow.com/questions/3665115/create-a-file-in-memory-for-user-to-download-not-through-server
@@ -326,38 +326,41 @@
           downloadFromServer(fileName);
         }
       }
-      
+
       function downloadFromServer(fileName) {
         console.log('downloadFromServer ' + fileName);
-        var url = `./${fileName}`;
+        var url = fileName;
         var link = document.getElementById('aDownload');
-        link.download = fileName;
+        link.download = ''; // this will lead to always using the correct file name. If setting "fileName" this could lead to errors, because "fileName" could include an HTTP path
         link.href = url;
         link.click();
       }
-      
+
       function openNewTab(url) {
         window.open(url, "_blank",);
-        //"_self" -> URL replaces current page
       }
-      
+
+      function switchUrl(url) {
+        parent.window.open(url, "_self",);
+      }
+
       function openNewWindow(url, width, height, top = 0, left = 0) {
         var windowOptions = "width=" + String(width) + ", height=" + String(height) + ", top=" + String(top) + ", left=" + String(left);
-         windowObjectReference.push(window.open(url, "_blank", windowOptions));
-         //"_self" -> URL replaces current page
-       }
-      
+        windowObjectReference.push(window.open(url, "_blank", windowOptions));
+        //"_self" -> URL replaces current page
+      }
+
       function closeWindow() {
         windowObjectReference.shift().close();
         //"_self" -> URL replaces current page
       }
-      
-      
+
+
       async function takeScreenshot() {
-      
+
         var stream;
-      
-      
+
+
         // Options for getDisplayMedia()
         var displayMediaOptions = {
           video: {
@@ -365,15 +368,15 @@
           },
           audio: false
         };
-      
-      
+
+
         try {
           stream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
           const track = stream.getVideoTracks()[0];
           let imageCapture = new ImageCapture(track);
           await new Promise(r => setTimeout(r, 200));//sleep to avoid pop-up in image
           imageCapture.grabFrame().then((bitmap) => {
-      
+
             // create a canvas
             const canvas = document.createElement('canvas');
             // resize it to the size of our ImageBitmap
@@ -396,65 +399,66 @@
               download(currentDate.getFullYear() + "-" + currentDate.getMonth() + "-" + currentDate.getDate() + "-" + currentDate.getHours() + "-" + currentDate.getMinutes() + "-" + currentDate.getSeconds() + ".png", blob);
               stream.getTracks().forEach(track => track.stop());
               stream = null;
-      
+
             });
           });
-      
+
         } catch (err) {
           console.error("Error: " + err);
           stream.getTracks().forEach(track => track.stop());
           stream = null;
         }
-      
-      
+
+
       }
-      
+
       function playSound(audioFilePath) {
-        if(audioFilePath == null){audioFilePath="./dist/media/Alarm01.wav"}
+        if (audioFilePath == null) { audioFilePath = "./dist/media/Alarm01.wav" }
         const audio = new Audio(audioFilePath);
         audio.play();
       }
-      
+
       function setSizes() {
         WebCC.Events.fire('SizeChanged', `${parent.window.innerWidth},${parent.window.innerHeight}`);
       }
-      
+
       function subscribeToResizing() {
         setSizes();
         // this is a workaround, because the size from default is 100 
         // and can be set even after initialization, so the sizes must be triggered again
         setTimeout(setSizes, 400);
-        parent.window.onresize = function () {
+        parent.window.addEventListener('resize', function() {
           setSizes();
-        }
+        });
+
       }
-      
+
       parent.window.addEventListener("touchmove", myTouchFunc);
       function myTouchFunc() {
         WebCC.Events.fire('Touched', `${event.touches[0].clientX},${event.touches[0].clientY}`);
       }
-      
+
       function onPropertyChanged(data) {
         if (data.key === 'TabTitle') {
           parent.document.title = data.value;
         }
       }
-      
+
       // https://stackoverflow.com/questions/326069/how-to-identify-if-a-webpage-is-being-loaded-inside-an-iframe-or-directly-into-t
       function inIframe() {
         try {
-            if (window.self === window.top){
-              return false;
-            }
-            else {
-              return window.parent.self !== window.top;
-            }
+          if (window.self === window.top) {
+            return false;
+          }
+          else {
+            return window.parent.self !== window.top;
+          }
 
         } catch (e) {
-            return true;
+          return true;
         }
       }
-      
+
       ////////////////////////////////////////////
       // Initialize the custom control
       WebCC.start(
@@ -466,7 +470,7 @@
             WebCC.Events.fire('Url', parent.window.location.href);
             onPropertyChanged({ key: 'TabTitle', value: WebCC.Properties.TabTitle })
             WebCC.onPropertyChanged.subscribe(onPropertyChanged);
-      
+
             WebCC.Events.fire('IsMonitorClient', WebCC.Extensions.HMI.Properties.IsMonitorMode);
             WebCC.Events.fire('UnifiedInContainer', inIframe());
           }
@@ -484,7 +488,8 @@
             takeScreenshot: takeScreenshot,
             openScreenOnMonitorX: openScreenOnMonitorX,
             checkFullscreen: checkFullscreen,
-            playSound:playSound
+            playSound: playSound,
+            switchUrl: switchUrl
           },
           //Events
           events: ['SizeChanged', 'Url', 'Touched', 'IsMonitorClient', 'UnifiedInContainer'],
@@ -500,9 +505,9 @@
         // timeout
         10000
       );
-		</script>
+    </script>
 
-	</div>
+  </div>
 </body>
 
 </html>
