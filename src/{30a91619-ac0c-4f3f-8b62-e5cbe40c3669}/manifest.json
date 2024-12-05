@@ -52,6 +52,14 @@
 						},
 						"description": "opens the given URL in a new tab"
 					},
+					"switchUrl": {
+						"parameters": {
+							"newUrl": {
+								"type": "string"
+							}
+						},
+						"description": "switches the current URL to change the Unified website to another website"
+					},
 					"takeScreenshot": {
 						"parameters": {},
 						"description": "takes a Screenshot of the website and downloads it as png to the client device"
